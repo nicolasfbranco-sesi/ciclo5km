@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Ciclo 5K Sub-20 — 36 Semanas</title>
+<style>
+:root{--bg:#07110d;--panel:#0d1c16;--panel2:#10241b;--text:#f4fff8;--muted:#9eb5a8;--line:#203b2d;--accent:#77f2a1;--done:#22c55e;--missed:#ef4444;--pending:#facc15;--shadow:0 18px 50px rgba(0,0,0,.28)}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:radial-gradient(circle at top right,#123424 0,transparent 35%),var(--bg);color:var(--text)}
+button{font:inherit}.wrap{max-width:1180px;margin:auto;padding:28px 18px 70px}.hero{display:grid;grid-template-columns:1.4fr .6fr;gap:18px;align-items:stretch}.card{background:linear-gradient(180deg,rgba(19,43,31,.92),rgba(9,24,17,.95));border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}
+.hero-main{padding:30px}.eyebrow{color:var(--accent);font-weight:800;text-transform:uppercase;letter-spacing:.14em;font-size:.74rem}.hero h1{font-size:clamp(2.2rem,5vw,4.2rem);line-height:.95;margin:10px 0 16px}.hero p{color:var(--muted);max-width:720px;line-height:1.6;margin:0}.goal{padding:26px;display:flex;flex-direction:column;justify-content:space-between}.goal strong{font-size:2.6rem}.goal small{color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0 24px}.stat{padding:18px}.stat b{display:block;font-size:1.5rem}.stat span{color:var(--muted);font-size:.85rem}.progress{height:10px;background:#07100c;border-radius:99px;overflow:hidden;margin-top:12px}.progress>i{display:block;height:100%;background:linear-gradient(90deg,#22c55e,#86efac);width:0%}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin:26px 0 16px}.filters{display:flex;gap:8px;flex-wrap:wrap}.chip,.action{border:1px solid var(--line);background:#0b1b13;color:var(--text);padding:10px 14px;border-radius:999px;cursor:pointer}.chip.active{background:var(--accent);color:#03210e;border-color:var(--accent);font-weight:800}.action:hover,.chip:hover{transform:translateY(-1px)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:.85rem;margin-bottom:18px}.dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:6px}.done{background:var(--done)}.missed{background:var(--missed)}.pending{background:var(--pending)}
+.phase{margin:28px 0}.phase-title{display:flex;gap:12px;align-items:end;justify-content:space-between;margin:0 4px 12px}.phase-title h2{margin:0;font-size:1.25rem}.phase-title p{margin:0;color:var(--muted);font-size:.88rem}.weeks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.week{padding:18px;border-radius:20px;position:relative;overflow:hidden}.week::before{content:"";position:absolute;inset:0 auto 0 0;width:5px;background:var(--pending)}.week[data-week-status="done"]::before{background:var(--done)}.week[data-week-status="missed"]::before{background:var(--missed)}.week.current{outline:2px solid var(--accent);box-shadow:0 0 0 5px rgba(119,242,161,.08),var(--shadow)}
+.week-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:14px}.week-title{font-size:1.05rem;font-weight:900}.week-date{color:var(--muted);font-size:.82rem;margin-top:2px}.badge{font-size:.75rem;font-weight:900;padding:7px 10px;border-radius:999px;background:rgba(250,204,21,.14);color:#fde047}.week[data-week-status="done"] .badge{background:rgba(34,197,94,.13);color:#86efac}.week[data-week-status="missed"] .badge{background:rgba(239,68,68,.13);color:#fca5a5}
+.workouts{display:grid;gap:8px}.workout{display:grid;grid-template-columns:72px 1fr auto;gap:10px;align-items:center;background:rgba(2,9,6,.34);border:1px solid rgba(255,255,255,.055);border-radius:14px;padding:11px}.day{font-size:.78rem;font-weight:900;color:var(--accent)}.desc{font-size:.88rem;line-height:1.35}.status{width:34px;height:34px;border:0;border-radius:10px;cursor:pointer;background:var(--pending);color:#151000;font-weight:900}.status[data-status="done"]{background:var(--done);color:white}.status[data-status="missed"]{background:var(--missed);color:white}.status[data-status="pending"]{background:var(--pending);color:#211b00}
+.current-note{margin-top:10px;color:var(--accent);font-size:.78rem;font-weight:800}.footer-note{margin-top:30px;padding:18px;color:var(--muted);font-size:.88rem;line-height:1.55}.hidden{display:none!important}
+@media(max-width:850px){.hero{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.weeks{grid-template-columns:1fr}}@media(max-width:520px){.stats{grid-template-columns:1fr 1fr}.workout{grid-template-columns:62px 1fr 34px}.wrap{padding-inline:12px}.hero-main,.goal{padding:22px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <div class="card hero-main"><div class="eyebrow">Ciclo de 36 semanas</div><h1>5K<br>SUB-20</h1><p>Seu calendário de treinos do PDF transformado em acompanhamento interativo. Clique no quadrado de cada treino para alternar entre <b>pendente</b>, <b>feito</b> e <b>não feito</b>.</p></div>
+    <div class="card goal"><div><small>Ritmo-alvo</small><strong>4:00/km</strong></div><div><small>Prova final</small><div style="font-size:1.25rem;font-weight:900;margin-top:4px">01/05/2027</div><div style="color:var(--accent);margin-top:8px;font-weight:800">Meta: 19:59 ou menos 🏆</div></div></div>
+  </section>
+
+  <section class="stats">
+    <div class="card stat"><span>Treinos feitos</span><b id="doneCount">0</b><div class="progress"><i id="progressBar"></i></div></div>
+    <div class="card stat"><span>Treinos não feitos</span><b id="missedCount">0</b></div>
+    <div class="card stat"><span>Pendentes</span><b id="pendingCount">0</b></div>
+    <div class="card stat"><span>Semana atual</span><b id="currentWeekLabel">—</b></div>
+  </section>
+
+  <div class="toolbar">
+    <div class="filters" id="filters"><button class="chip active" data-filter="all">Todas</button><button class="chip" data-filter="current">Semana atual</button><button class="chip" data-filter="pending">Pendentes</button><button class="chip" data-filter="done">Concluídas</button><button class="chip" data-filter="missed">Com falha</button></div>
+    <button class="action" id="resetBtn">Resetar progresso</button>
+  </div>
+  <div class="legend"><span><i class="dot done"></i>Verde = feito</span><span><i class="dot missed"></i>Vermelho = não feito</span><span><i class="dot pending"></i>Amarelo = pendente</span></div>
+  <main id="app"></main>
+  <div class="card footer-note">Os ritmos e recuperações abaixo seguem o ciclo fornecido. O próprio documento recomenda reavaliar as zonas com testes ao longo dos meses e não transformar os treinos leves em competição.</div>
+</div>
+<script>
+const phases=[
+ {name:'🟢 FASE 1 — BASE + TÉCNICA',range:'Semanas 1–6 · 17/08 a 26/09',weeks:[
+  ['6×400m — 4:10–4:15/km, rec. 200m trote','4 km — 5:25–5:45/km','3×6 min — 4:35–4:40/km, rec. 2 min','Corrida 5 km AlwaysFit'],
+  ['8×300m — 4:00–4:05/km, rec. 200m','5 km — 5:20–5:40/km','20 min contínuos — 4:35–4:40/km','9 km — 5:15–5:35/km'],
+  ['5×600m — 4:08–4:12/km, rec. 2 min','5 km — 5:20–5:40/km','Fartlek 6×2 min — 4:15–4:25/km / 2 min leve','9 km — 5:15–5:35/km'],
+  ['6×400m — 4:05–4:10/km, rec. 200m','4 km — 5:30–5:50/km','3×5 min — 4:30–4:35/km, rec. 2 min','8 km — 5:20–5:45/km'],
+  ['5×800m — 4:05–4:10/km, rec. 2:30 trote','4 km — 5:20–5:40/km','20 min — 4:08–4:18/km','(Domingo: Avaí RUN 5K)Estratégia Teste 1 — km 1 4:18 · km 2 4:16 · km 3 4:14 · km 4 4:10'],
+  ['DESCANSO','4 km — 5:30–5:50/km','5 km — 5:15–5:35/km + 4×100 m','8 km — 5:10–5:30/km']
+ ]},
+ {name:'🔵 FASE 2 — FORÇA + LIMIAR',range:'Semanas 7–12 · 28/09 a 07/11',weeks:[
+  ['6×600m — 4:00–4:05/km, rec. 2 min','5 km — 5:20–5:40/km','3×8 min — 4:25–4:30/km','10 km — 5:10–5:30/km'],
+  ['5×800m — 4:00–4:05/km, rec. 2:30','5 km — 5:20–5:40/km','25 min — 4:25–4:30/km','11 km — 5:10–5:30/km'],
+  ['10×400m — 3:58–4:03/km, rec. 200m','5 km — 5:20–5:40/km','Fartlek 6×3 min — 4:10–4:15/km','10 km — 5:10–5:30/km'],
+  ['4×1 km — 4:03–4:07/km, rec. 2:30','5 km — 5:25–5:45/km','3×7 min — 4:20–4:25/km','9 km — 5:15–5:35/km'],
+  ['6×800m — 3:58–4:03/km, rec. 2 min','5–6 km — 5:20–5:40/km','30 min — 4:25–4:30/km','11 km — 5:10–5:30/km'],
+  ['5×1 km — 4:00–4:05/km, rec. 2:30','5 km — 5:25–5:45/km','Fartlek 4×5 min — 4:10–4:15/km','Teste de 3 km']
+ ]},
+ {name:'🟠 FASE 3 — DESENVOLVIMENTO DE VO₂MAX',range:'Semanas 13–18 · 09/11 a 19/12',weeks:[
+  ['5×1 km — 4:00–4:05/km, rec. 2:30','5 km — 5:20–5:40/km','20 min — 4:20–4:25/km','11 km — 5:10–5:30/km'],
+  ['6×800m — 3:55–4:00/km, rec. 2:30','5 km leve — 5:20–5:40/km','4×6 min — 4:15–4:20/km','12 km — 5:10–5:30/km'],
+  ['4×1200m — 4:00–4:05/km, rec. 3 min','5 km leve — 5:20–5:40/km','Fartlek 8×2 min — 4:00–4:10/km','11 km — 5:10–5:30/km'],
+  ['5×800m — 3:55–4:00/km, rec. 2:30','5 km leve — 5:30–5:50/km','3 km leve + 3×400 m — 4:00–4:05/km, rec. completa ','(Domingo: CSI RUN 5K) Teste 2 — 4:10 · 4:08 · 4:06 · 4:04 · 3:55–4:00/km · meta ~20:30–20:50'],
+  ['DESCANSO','5 km leve — 5:30–5:50/km','5–6 km leve — 5:15–5:40/km + 4×100 m','8 km — 5:15–5:40/km'],
+  ['8×400m — 3:50–3:55/km, rec. 200m','4 km regenerativo — 5:20–5:40/km','20 min — 4:20–4:25/km','9 km — 5:10–5:30/km']
+ ]},
+ {name:'🔴 FASE 4 — ESPECÍFICA DE 5 KM',range:'Semanas 19–24 · 21/12 a 30/01',weeks:[
+  ['4×1 km — 3:58–4:02/km, rec. 2:30','5 km leve — 5:20–5:40/km','3×8 min — 4:10–4:15/km','11 km — 5:20–5:40/km'],
+  ['5×1 km — 3:55–4:00/km, rec. 2:30','5 km leve — 5:20–5:40/km','6×3 min — 4:00–4:05/km','12 km — 5:05–5:20/km'],
+  ['3×1600m — 4:00/km, rec. 3 min','5 km leve — 5:20–5:40/km','25 min — 4:10–4:15/km','11 km — 5:05–5:20/km'],
+  ['8×600m — 3:50–3:55/km, rec. 2 min','5 km leve — 5:20–5:40/km','4×5 min — 4:00–4:05/km','10 km — 5:05–5:20/km'],
+  ['5×1 km — 3:55–3:58/km, rec. 2 min','4 km leve — 5:20–5:40/km','2×12 min — 4:05–4:10/km','12 km — 5:05–5:20/km'],
+  ['6×800m — 3:50–3:55/km, rec. 2 min','5 km leve — 5:20–5:40/km','20 min — 4:05–4:10/km','10 km — 5:05–5:20/km']
+ ]},
+ {name:'🟣 FASE 5 — SUB-20',range:'Semanas 25–30 · 01/02 a 13/03',weeks:[
+  ['4×1200m — 3:58–4:00/km, rec. 3 min','5 km leve — 5:20–5:40/km','3×10 min — 4:05/km','12 km — 4:55–5:15/km'],
+  ['5×1 km — 3:55–3:58/km, rec. 2 min','5 km leve — 5:10–5:30/km','6×4 min — 4:00–4:05/km','11 km — 4:55–5:15/km'],
+  ['3×1600m — 3:58–4:00/km, rec. 3 min','5 km leve — 5:10–5:30/km','25 min — 4:05/km','12 km — 4:55–5:15/km'],
+  ['10×400m — 3:45–3:50/km, rec. 200m','4 km leve — 5:10–5:30/km','3×8 min — 4:00–4:05/km','9 km — 4:55–5:15/km'],
+  ['5×1 km — 3:53–3:57/km, rec. 2:30','5 km leve — 5:10–5:30/km','2×15 min — 4:03–4:08/km','12 km — 4:55–5:15/km'],
+  ['4×1000m — 3:53–3:58/km, rec. 2:30','5 km leve — 5:10–5:30/km','3×6 min — 4:00–4:05/km, rec. 2:00','TESTE 5 km — 4:01 · 4:00 · 4:00 · 3:59 · 3:50–3:58/km · meta SUB-20']
+ ]},
+ {name:'🏁 FASE 6 — PICO DE PERFORMANCE',range:'Semanas 31–34 · 15/03 a 10/04',weeks:[
+  ['3×1600m — 3:58/km, rec. 3 min','5 km leve — 5:10–5:30/km','6×3 min — 3:55–4:00/km','11 km — 4:55–5:15/km'],
+  ['5×1 km — 3:52–3:56/km, rec. 2:30','5 km leve — 5:10–5:30/km','20 min — 4:00–4:05/km','10 km — 4:45–5:05/km'],
+  ['3×2 km — 4:00/km, rec. 3 min','5 km leve — 5:10–5:30/km','8×400m — 3:45–3:50/km','11 km — 4:45–5:05/km'],
+  ['4×1 km — 3:50–3:55/km, rec. 2:30','5 km leve — 5:10–5:30/km','3×6 min — 4:00/km','9 km — 4:45–5:05/km']
+ ]},
+ {name:'🟡 FASE 7 — TAPER',range:'Semanas 35–36 · 12/04 a 24/04',weeks:[
+  ['5×800m — 3:50–3:55/km, rec. 2:30','5 km muito leve — 5:20–5:40/km','20 min — 4:05–4:10/km','8 km — 5:00–5:15/km'],
+  ['4×600m — 3:48–3:55/km, rec. 2 min','5 km leve — 5:40–6:00/km','3×1 km — 3:58–4:00/km, rec. 3 min','7 km bem leve — 5:40–6:00/km']
+ ]},
+ {name:'🏆 SEMANA DA PROVA',range:'26/04 a 01/05/2027',race:true,weeks:[
+  ['4 km leve + 4×100m progressivos','3 km — 5:20–5:40/km, bem confortável','3×400m — 3:50–3:55/km, recuperação completa','PROVA — 5 KM · meta 19:59 ou menos']
+ ]}
+];
+const DAYS=['Segunda','Quarta','Quinta','Sábado']; const start=new Date('2026-08-17T12:00:00');
+const raceStart=new Date('2027-04-26T12:00:00');
+let serial=0; phases.forEach(p=>p.weeks.forEach(w=>{serial++; w.number=p.race?'PROVA':serial; w.start=p.race?raceStart:new Date(start.getTime()+(serial-1)*7*86400000)}));
+const state=JSON.parse(localStorage.getItem('ciclo5k-status')||'{}');
+const key=(w,d)=>`${w}-${d}`;
+function save(){localStorage.setItem('ciclo5k-status',JSON.stringify(state))}
+function fmt(d){return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'})}
+function weekStatus(w){const vals=[0,1,2,3].map(d=>state[key(w.number,d)]||'pending'); if(vals.every(v=>v==='done'))return'done'; if(vals.includes('missed'))return'missed'; return'pending'}
+function currentWeek(){const now=new Date(); if(now<start)return null; const n=Math.floor((now-start)/(7*86400000))+1; return n>=1&&n<=36?n:(now>=raceStart&&now<=new Date('2027-05-02T23:59:59')?'PROVA':null)}
+function render(){const app=document.getElementById('app'); app.innerHTML=''; const cur=currentWeek(); document.getElementById('currentWeekLabel').textContent=cur?`#${cur}`:'—';
+ phases.forEach(p=>{const sec=document.createElement('section'); sec.className='phase'; sec.innerHTML=`<div class="phase-title"><div><h2>${p.name}</h2><p>${p.range}</p></div></div><div class="weeks"></div>`; const grid=sec.querySelector('.weeks');
+ p.weeks.forEach(w=>{const ws=weekStatus(w); const el=document.createElement('article'); el.className='card week'+(String(w.number)===String(cur)?' current':''); el.dataset.weekStatus=ws; el.dataset.filterStatus=ws; el.dataset.isCurrent=String(String(w.number)===String(cur));
+ const end=new Date(w.start.getTime()+5*86400000); const title=p.race?'Semana da prova':`Semana ${w.number}`; const date=p.race?'26/04/2027 → 01/05/2027':`${fmt(w.start)} → ${fmt(end)}`;
+ el.innerHTML=`<div class="week-head"><div><div class="week-title">${title}</div><div class="week-date">${date}</div>${String(w.number)===String(cur)?'<div class="current-note">● SUA SEMANA ATUAL</div>':''}</div><span class="badge">${ws==='done'?'FEITA':ws==='missed'?'NÃO FEITA':'PENDENTE'}</span></div><div class="workouts"></div>`;
+ const workouts=el.querySelector('.workouts'); w.slice(0,4).forEach((desc,i)=>{const st=state[key(w.number,i)]||'pending'; const row=document.createElement('div'); row.className='workout'; row.innerHTML=`<div class="day">${DAYS[i]}</div><div class="desc">${desc}</div><button class="status" data-status="${st}" title="Clique para mudar status">${st==='done'?'✓':st==='missed'?'×':'•'}</button>`; row.querySelector('button').onclick=()=>{const seq=['pending','done','missed']; state[key(w.number,i)]=seq[(seq.indexOf(st)+1)%3]; save(); render(); applyFilter(document.querySelector('.chip.active').dataset.filter)}; workouts.appendChild(row)}); grid.appendChild(el)}); app.appendChild(sec)}); updateStats();}
+function updateStats(){let done=0,missed=0,pending=0,total=0; phases.forEach(p=>p.weeks.forEach(w=>[0,1,2,3].forEach(d=>{total++; const s=state[key(w.number,d)]||'pending'; if(s==='done')done++; else if(s==='missed')missed++; else pending++}))); doneCount.textContent=done; missedCount.textContent=missed; pendingCount.textContent=pending; progressBar.style.width=`${(done/total)*100}%`}
+function applyFilter(f){document.querySelectorAll('.week').forEach(w=>{w.classList.toggle('hidden',!(f==='all'||(f==='current'&&w.dataset.isCurrent==='true')||w.dataset.filterStatus===f))}); document.querySelectorAll('.phase').forEach(p=>p.classList.toggle('hidden',!p.querySelector('.week:not(.hidden)')))}
+document.getElementById('filters').onclick=e=>{if(!e.target.matches('.chip'))return; document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); e.target.classList.add('active'); applyFilter(e.target.dataset.filter)};
+document.getElementById('resetBtn').onclick=()=>{if(confirm('Apagar todos os status salvos?')){localStorage.removeItem('ciclo5k-status'); Object.keys(state).forEach(k=>delete state[k]); render()}};
+render();
+</script>
+</body>
+</html>
