@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pace3K — Calculadora de Zonas de Corrida</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Chart.js para o gráfico de evolução -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-300 flex flex-col justify-between">
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 font-medium text-sm pointer-events-none">
+        <svg id="toast-icon" class="w-5 h-5 text-emerald-400 dark:text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        <span id="toast-message">Notificação</span>
+    </div>
+
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-40 backdrop-blur-md bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 transition-colors">
+        <div class="max-w-5xl mx-auto px-4 py-3.5 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-600 to-teal-500 dark:from-emerald-400 dark:to-teal-300 bg-clip-text text-transparent">Pace3K</h1>
+                    <p class="text-[10px] uppercase font-bold tracking-widest text-slate-400 dark:text-slate-500">Zonas de Corrida</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button id="theme-toggle" type="button" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition" title="Alternar tema">
+                    <svg id="theme-toggle-dark-icon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                    <svg id="theme-toggle-light-icon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-5xl mx-auto px-4 py-8 w-full flex-grow space-y-10">
+
+        <!-- Header / Presentation -->
+        <section class="text-center space-y-3 max-w-2xl mx-auto">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-semibold uppercase tracking-wider">
+                ⚡ Calculadora Oficial de Ritmos
+            </div>
+            <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                Calculadora de Zonas de Corrida
+            </h2>
+            <p class="text-slate-600 dark:text-slate-400 text-base sm:text-lg">
+                Descubra seus ritmos de treino a partir do seu teste de 3 km.
+            </p>
+        </section>
+
+        <!-- Input Form Card -->
+        <section class="max-w-xl mx-auto">
+            <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-200/80 dark:border-slate-800 relative overflow-hidden">
+                <div class="absolute -top-12 -right-12 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+                <form id="calc-form" onsubmit="event.preventDefault(); handleCalculate();" class="space-y-6">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                            Seu teste de 3 km
+                        </label>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Informe o tempo total gasto para concluir os 3000 metros.</p>
+
+                        <!-- Input fields -->
+                        <div class="grid grid-cols-2 gap-4 pt-2">
+                            <div class="space-y-1.5">
+                                <label for="input-min" class="text-xs font-semibold text-slate-500 dark:text-slate-400">Minutos</label>
+                                <div class="relative">
+                                    <input type="number" id="input-min" min="0" max="180" placeholder="12" required
+                                           class="w-full text-center text-2xl font-bold bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-2xl py-3 px-4 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition text-slate-900 dark:text-white placeholder-slate-400">
+                                    <span class="absolute right-3 top-3.5 text-xs font-medium text-slate-400">min</span>
+                                </div>
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <label for="input-sec" class="text-xs font-semibold text-slate-500 dark:text-slate-400">Segundos</label>
+                                <div class="relative">
+                                    <input type="number" id="input-sec" min="0" max="59" placeholder="53" required
+                                           class="w-full text-center text-2xl font-bold bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-2xl py-3 px-4 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition text-slate-900 dark:text-white placeholder-slate-400">
+                                    <span class="absolute right-3 top-3.5 text-xs font-medium text-slate-400">seg</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rapid Presets -->
+                        <div class="pt-2 flex items-center justify-between gap-2 overflow-x-auto pb-1 text-xs">
+                            <span class="text-slate-400 font-medium whitespace-nowrap">Exemplos rápidos:</span>
+                            <div class="flex gap-1.5">
+                                <button type="button" onclick="setPreset(10, 30)" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 transition font-mono">10:30</button>
+                                <button type="button" onclick="setPreset(12, 53)" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 transition font-mono">12:53</button>
+                                <button type="button" onclick="setPreset(15, 0)" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 transition font-mono">15:00</button>
+                                <button type="button" onclick="setPreset(18, 20)" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 transition font-mono">18:20</button>
+                            </div>
+                        </div>
+
+                        <!-- Error Message Container -->
+                        <div id="error-message" class="hidden text-red-500 dark:text-red-400 text-xs font-semibold bg-red-500/10 p-3 rounded-xl border border-red-500/20 flex items-center gap-2">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span id="error-text">Tempo inválido.</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-extrabold text-base tracking-wide shadow-lg shadow-emerald-500/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 7hr6m-6 4h6m-6 4h6M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        CALCULAR ZONAS
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Results Section (Hidden until calculated) -->
+        <section id="results-section" class="hidden space-y-8 animate-fade-in">
+
+            <!-- Hero Result Highlight Card -->
+            <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden border border-slate-700/50">
+                <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="relative z-10 space-y-6">
+                    <!-- Top motivational tag -->
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/30">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            <span>Teste concluído! Agora você sabe seus ritmos de treinamento.</span>
+                        </div>
+                        <span class="text-xs text-slate-400 font-medium">Seu Resultado</span>
+                    </div>
+
+                    <!-- Metrics Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                        <div class="bg-slate-800/80 backdrop-blur rounded-2xl p-4 border border-slate-700/60 flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-slate-700/60 flex items-center justify-center text-emerald-400 shrink-0">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                            <div>
+                                <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Teste de 3 km</p>
+                                <p id="res-test-time" class="text-3xl font-extrabold text-white font-mono">12:53</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-800/80 backdrop-blur rounded-2xl p-4 border border-slate-700/60 flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-slate-700/60 flex items-center justify-center text-teal-400 shrink-0">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            </div>
+                            <div>
+                                <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Pace Médio</p>
+                                <p id="res-avg-pace" class="text-3xl font-extrabold text-white font-mono">4:18 <span class="text-base font-normal text-slate-400">/km</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action toolbar -->
+                    <div class="flex flex-wrap items-center gap-3 pt-2">
+                        <button onclick="saveCurrentResult()" id="btn-save" class="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs sm:text-sm flex items-center gap-2 transition shadow-lg shadow-emerald-500/20 active:scale-95">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                            Salvar resultado
+                        </button>
+                        <button onclick="copySummary()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs sm:text-sm flex items-center gap-2 border border-slate-700 transition active:scale-95">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                            Copiar resumo
+                        </button>
+                        <button onclick="shareResult()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs sm:text-sm flex items-center gap-2 border border-slate-700 transition active:scale-95">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                            Compartilhar
+                        </button>
+                        <button onclick="resetCalculator()" class="px-4 py-2.5 rounded-xl bg-slate-800/50 hover:bg-slate-800 text-slate-400 hover:text-white font-medium text-xs sm:text-sm flex items-center gap-1.5 border border-slate-700/50 transition ml-auto">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                            Refazer
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Intensity Bar Visualizer -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-md border border-slate-200 dark:border-slate-800 space-y-3">
+                <div class="flex justify-between items-center text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    <span>Mais leve</span>
+                    <span class="text-slate-700 dark:text-slate-300">← Intensidade Progressiva →</span>
+                    <span>Mais forte</span>
+                </div>
+
+                <!-- 7 Segments Bar -->
+                <div class="grid grid-cols-7 gap-1.5 h-10 rounded-xl overflow-hidden p-1 bg-slate-100 dark:bg-slate-800">
+                    <div id="bar-z1" title="Z1 - Recuperação" class="rounded-lg bg-sky-500 flex items-center justify-center text-white font-extrabold text-xs shadow">Z1</div>
+                    <div id="bar-z2" title="Z2 - Leve" class="rounded-lg bg-emerald-500 flex items-center justify-center text-white font-extrabold text-xs shadow">Z2</div>
+                    <div id="bar-z3" title="Z3 - Moderado" class="rounded-lg bg-amber-500 flex items-center justify-center text-white font-extrabold text-xs shadow">Z3</div>
+                    <div id="bar-z4" title="Z4 - Limiar" class="rounded-lg bg-orange-500 flex items-center justify-center text-white font-extrabold text-xs shadow">Z4</div>
+                    <div id="bar-z5" title="Z5 - Ritmo de prova" class="rounded-lg bg-red-500 flex items-center justify-center text-white font-extrabold text-xs shadow">Z5</div>
+                    <div id="bar-z6" title="Z6 - Intervalado" class="rounded-lg bg-purple-600 flex items-center justify-center text-white font-extrabold text-xs shadow">Z6</div>
+                    <div id="bar-z7" title="Z7 - Velocidade" class="rounded-lg bg-pink-600 flex items-center justify-center text-white font-extrabold text-xs shadow">Z7</div>
+                </div>
+
+                <div class="grid grid-cols-7 gap-1 text-center font-mono text-[10px] text-slate-500 font-semibold">
+                    <span id="subpace-z1">5:35</span>
+                    <span id="subpace-z2">5:10</span>
+                    <span id="subpace-z3">4:44</span>
+                    <span id="subpace-z4">4:31</span>
+                    <span id="subpace-z5">4:18</span>
+                    <span id="subpace-z6">4:05</span>
+                    <span id="subpace-z7">3:52</span>
+                </div>
+            </div>
+
+            <!-- Quick Interpretation Box -->
+            <div class="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50 rounded-2xl p-5 space-y-2">
+                <h3 class="text-sm font-bold text-emerald-900 dark:text-emerald-300 uppercase tracking-wider flex items-center gap-2">
+                    <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Como interpretar suas zonas
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs text-slate-700 dark:text-slate-300 pt-1">
+                    <div class="p-2 rounded-lg bg-white/60 dark:bg-slate-900/40"><strong class="text-sky-600 dark:text-sky-400">Z1–Z2:</strong> Recuperação e rodagem leve (base aeróbica)</div>
+                    <div class="p-2 rounded-lg bg-white/60 dark:bg-slate-900/40"><strong class="text-amber-600 dark:text-amber-400">Z3:</strong> Corrida moderada e ritmo sustentado</div>
+                    <div class="p-2 rounded-lg bg-white/60 dark:bg-slate-900/40"><strong class="text-orange-600 dark:text-orange-400">Z4:</strong> Limiar anaeróbico (ritmo firme)</div>
+                    <div class="p-2 rounded-lg bg-white/60 dark:bg-slate-900/40"><strong class="text-red-600 dark:text-red-400">Z5:</strong> Ritmo forte / prova de 3k–5k</div>
+                    <div class="p-2 rounded-lg bg-white/60 dark:bg-slate-900/40 col-span-1 sm:col-span-2 md:col-span-2"><strong class="text-purple-600 dark:text-purple-400">Z6–Z7:</strong> Trabalhos rápidos, tiros e treino intervalado</div>
+                </div>
+            </div>
+
+            <!-- Zones Grid Cards -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center justify-between">
+                    <span>Tabela de Zonas Calculadas</span>
+                    <span class="text-xs font-normal text-slate-500">Do mais leve ao mais rápido</span>
+                </h3>
+
+                <div id="zones-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Dynamic Zone Cards Rendered Here -->
+                </div>
+            </div>
+
+            <!-- Important Disclaimer -->
+            <div class="p-4 rounded-2xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs text-slate-500 dark:text-slate-400 flex items-start gap-3">
+                <svg class="w-5 h-5 text-slate-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <p>
+                    <strong>Aviso importante:</strong> As zonas calculadas são uma estimativa matemática baseada no pace médio do seu teste de 3 km. Elas servem como referência prática para estruturar seus treinos diários e não substituem uma avaliação física ou ergospirométrica profissional.
+                </p>
+            </div>
+
+        </section>
+
+        <!-- Evolution Section (Visible if >= 2 tests in history) -->
+        <section id="evolution-section" class="hidden space-y-6">
+            <div class="border-t border-slate-200 dark:border-slate-800 pt-8">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white">Sua Evolução</h3>
+                        <p class="text-xs text-slate-500">Acompanhamento do seu desempenho ao longo dos testes salvos</p>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold">Progresso</span>
+                </div>
+
+                <!-- Stats summary -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                    <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+                        <span class="text-[11px] font-bold uppercase text-slate-400">Melhor Tempo 3k</span>
+                        <p id="evo-best-time" class="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono mt-1">--:--</p>
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+                        <span class="text-[11px] font-bold uppercase text-slate-400">Melhor Pace</span>
+                        <p id="evo-best-pace" class="text-xl sm:text-2xl font-black text-teal-600 dark:text-teal-400 font-mono mt-1">--:--/km</p>
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+                        <span class="text-[11px] font-bold uppercase text-slate-400">Diferença</span>
+                        <p id="evo-diff" class="text-xl sm:text-2xl font-black text-slate-800 dark:text-slate-100 font-mono mt-1">--</p>
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+                        <span class="text-[11px] font-bold uppercase text-slate-400">Evolução %</span>
+                        <p id="evo-percent" class="text-xl sm:text-2xl font-black text-slate-800 dark:text-slate-100 font-mono mt-1">0%</p>
+                    </div>
+                </div>
+
+                <!-- Evolution Chart Canvas Container -->
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-md">
+                    <div class="h-64 relative">
+                        <canvas id="evolutionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- History Section -->
+        <section class="space-y-4 border-t border-slate-200 dark:border-slate-800 pt-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">Histórico de testes</h3>
+                    <p class="text-xs text-slate-500">Seus testes de 3 km salvos localmente neste navegador</p>
+                </div>
+                <button id="btn-clear-history" onclick="clearAllHistory()" class="hidden text-xs text-red-500 hover:text-red-600 font-medium px-3 py-1.5 rounded-lg hover:bg-red-500/10 transition">
+                    Limpar histórico
+                </button>
+            </div>
+
+            <!-- Empty History State -->
+            <div id="history-empty" class="bg-white dark:bg-slate-900 rounded-2xl p-8 text-center border border-slate-200 dark:border-slate-800 space-y-2">
+                <div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto text-slate-400">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">Nenhum teste salvo ainda</p>
+                <p class="text-xs text-slate-400">Faça um cálculo acima e clique em "Salvar resultado" para registrar no seu histórico.</p>
+            </div>
+
+            <!-- History Table Container -->
+            <div id="history-container" class="hidden overflow-hidden bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50 dark:bg-slate-800/50 text-slate-400 text-xs uppercase font-bold tracking-wider border-b border-slate-200 dark:border-slate-800">
+                            <tr>
+                                <th class="py-3 px-4">Data</th>
+                                <th class="py-3 px-4">Tempo (3 km)</th>
+                                <th class="py-3 px-4">Pace Médio</th>
+                                <th class="py-3 px-4 text-right">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body" class="divide-y divide-slate-200 dark:divide-slate-800 font-medium">
+                            <!-- Dynamic History Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-6 mt-12 transition-colors">
+        <div class="max-w-5xl mx-auto px-4 text-center space-y-2">
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+                <strong>Pace3K</strong> — Calculadora e Planejamento de Ritmos de Corrida de Rua.
+            </p>
+            <p class="text-[11px] text-slate-400 dark:text-slate-600">
+                Mantenha a consistência, respeite seus limites e bons treinos! 🏃‍♂️💨
+            </p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Code -->
+    <script>
+        /**
+         * GLOBAL CONFIG & ZONE DEFINITIONS
+         * Zones factors:
+         * Z1: 130% (+30% slower than test pace)
+         * Z2: 120% (+20% slower)
+         * Z3: 110% (+10% slower)
+         * Z4: 105% (+5% slower)
+         * Z5: 100% (exact 3k test pace)
+         * Z6: 95% (-5% faster)
+         * Z7: 90% (-10% faster)
+         */
+        const ZONE_CONFIGS = [
+            {
+                code: 'Z1',
+                name: 'Recuperação',
+                factor: 1.30,
+                tag: 'Muito Leve',
+                badgeBg: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/30',
+                borderHover: 'hover:border-sky-500/50',
+                barBg: 'bg-sky-500',
+                desc: 'Corrida extremamente leve, utilizada principalmente para recuperação ativa, aquecimento e desaquecimento.'
+            },
+            {
+                code: 'Z2',
+                name: 'Leve',
+                factor: 1.20,
+                tag: 'Confortável',
+                badgeBg: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30',
+                borderHover: 'hover:border-emerald-500/50',
+                barBg: 'bg-emerald-500',
+                desc: 'Corrida confortável e sustentável por longos períodos. Base fundamental do desenvolvimento aeróbico.'
+            },
+            {
+                code: 'Z3',
+                name: 'Moderado',
+                factor: 1.10,
+                tag: 'Moderado',
+                badgeBg: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30',
+                borderHover: 'hover:border-amber-500/50',
+                barBg: 'bg-amber-500',
+                desc: 'Ritmo moderado, exige mais atenção à respiração. Melhora a eficiência aeróbica e ritmo de maratona/meia.'
+            },
+            {
+                code: 'Z4',
+                name: 'Limiar',
+                factor: 1.05,
+                tag: 'Limiar Anaeróbico',
+                badgeBg: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/30',
+                borderHover: 'hover:border-orange-500/50',
+                barBg: 'bg-orange-500',
+                desc: 'Ritmo firme no limite do acúmulo de lactato (tempo run). Aumenta a capacidade de sustentar ritmos rápidos.'
+            },
+            {
+                code: 'Z5',
+                name: 'Ritmo de prova',
+                factor: 1.00,
+                tag: 'Ritmo do Teste 3K',
+                badgeBg: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30',
+                borderHover: 'hover:border-red-500/50',
+                barBg: 'bg-red-500',
+                desc: 'Ritmo forte correspondente ao seu máximo de 3 km. Desenvolve a potência aeróbica máxima (VO2máx).'
+            },
+            {
+                code: 'Z6',
+                name: 'Intervalado',
+                factor: 0.95,
+                tag: 'Tiros VO2Max',
+                badgeBg: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30',
+                borderHover: 'hover:border-purple-500/50',
+                barBg: 'bg-purple-600',
+                desc: 'Treinos de repetições e tiros curtos (200m a 800m). Foco na velocidade, tolerância ao lactato e técnica.'
+            },
+            {
+                code: 'Z7',
+                name: 'Velocidade',
+                factor: 0.90,
+                tag: 'Sprint Máximo',
+                badgeBg: 'bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/30',
+                borderHover: 'hover:border-pink-500/50',
+                barBg: 'bg-pink-600',
+                desc: 'Esforço máximo em tiro curtíssimo (50m a 200m). Recrutamento neuromuscular máximo e aceleração.'
+            }
+        ];
+
+        // Global State
+        let currentCalculation = null;
+        let chartInstance = null;
+
+        // LOCAL STORAGE KEYS
+        const STORAGE_HISTORY_KEY = 'pace3k_history_v1';
+        const STORAGE_THEME_KEY = 'pace3k_theme';
+
+        /* ==========================================================================
+           UTILITY MATHEMATICAL FUNCTIONS (PURE & PRECISE)
+           ========================================================================== */
+
+        /** Converts minutes and seconds into total seconds */
+        function timeToSeconds(minutes, seconds) {
+            return (parseInt(minutes, 10) * 60) + parseInt(seconds, 10);
+        }
+
+        /** Formats pure seconds into MM:SS format */
+        function secondsToMMSS(totalSeconds) {
+            const roundedSeconds = Math.round(totalSeconds);
+            const m = Math.floor(roundedSeconds / 60);
+            const s = roundedSeconds % 60;
+            return `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        /** Calculates average pace in seconds per kilometer for a 3km test */
+        function calculateAveragePaceSeconds(totalSeconds) {
+            return totalSeconds / 3;
+        }
+
+        /** Calculates target zone pace in seconds */
+        function calculateZonePaceSeconds(avgPaceSeconds, factor) {
+            return avgPaceSeconds * factor;
+        }
+
+        /* ==========================================================================
+           THEME CONTROLLER
+           ========================================================================== */
+        function initTheme() {
+            const savedTheme = localStorage.getItem(STORAGE_THEME_KEY);
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('theme-toggle-light-icon').classList.remove('hidden');
+                document.getElementById('theme-toggle-dark-icon').classList.add('hidden');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('theme-toggle-dark-icon').classList.remove('hidden');
+                document.getElementById('theme-toggle-light-icon').classList.add('hidden');
+            }
+        }
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem(STORAGE_THEME_KEY, isDark ? 'dark' : 'light');
+            
+            document.getElementById('theme-toggle-light-icon').classList.toggle('hidden', !isDark);
+            document.getElementById('theme-toggle-dark-icon').classList.toggle('hidden', isDark);
+
+            if (chartInstance) {
+                renderEvolutionChart();
+            }
+        });
+
+        /* ==========================================================================
+           CORE APP LOGIC
+           ========================================================================== */
+
+        function setPreset(min, sec) {
+            document.getElementById('input-min').value = min;
+            document.getElementById('input-sec').value = sec;
+            hideError();
+            handleCalculate();
+        }
+
+        function showError(msg) {
+            const errorContainer = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            errorText.textContent = msg;
+            errorContainer.classList.remove('hidden');
+        }
+
+        function hideError() {
+            document.getElementById('error-message').classList.add('hidden');
+        }
+
+        function handleCalculate() {
+            hideError();
+            const minVal = document.getElementById('input-min').value;
+            const secVal = document.getElementById('input-sec').value;
+
+            // Validation
+            if (minVal === '' || secVal === '') {
+                showError('Por favor, preencha minutos e segundos.');
+                return;
+            }
+
+            const min = parseInt(minVal, 10);
+            const sec = parseInt(secVal, 10);
+
+            if (isNaN(min) || isNaN(sec)) {
+                showError('Por favor, insira valores numéricos válidos.');
+                return;
+            }
+
+            if (min < 0) {
+                showError('Minutos não podem ser valores negativos.');
+                return;
+            }
+
+            if (sec < 0 || sec > 59) {
+                showError('Os segundos devem estar entre 0 e 59.');
+                return;
+            }
+
+            const totalSeconds = timeToSeconds(min, sec);
+
+            if (totalSeconds < 30) {
+                showError('O tempo total é curto demais para um teste de 3 km.');
+                return;
+            }
+
+            // Calculation
+            const avgPaceSec = calculateAveragePaceSeconds(totalSeconds);
+            const formattedPace = secondsToMMSS(avgPaceSec);
+            const formattedTestTime = secondsToMMSS(totalSeconds);
+
+            // Calculate Zones
+            const zonesData = ZONE_CONFIGS.map(z => {
+                const zonePaceSec = calculateZonePaceSeconds(avgPaceSec, z.factor);
+                return {
+                    ...z,
+                    paceSec: zonePaceSec,
+                    formattedPace: secondsToMMSS(zonePaceSec)
+                };
+            });
+
+            currentCalculation = {
+                id: Date.now(),
+                date: new Date().toLocaleDateString('pt-BR'),
+                isoDate: new Date().toISOString(),
+                totalSeconds,
+                formattedTestTime,
+                avgPaceSec,
+                formattedPace,
+                zones: zonesData
+            };
+
+            // Display Results
+            renderResults(currentCalculation);
+            showToast('Zonas de treino calculadas com sucesso!');
+        }
+
+        function renderResults(data) {
+            document.getElementById('res-test-time').textContent = data.formattedTestTime;
+            document.getElementById('res-avg-pace').innerHTML = `${data.formattedPace} <span class="text-base font-normal text-slate-400">/km</span>`;
+
+            // Update Intensity bar sub-paces
+            data.zones.forEach(z => {
+                const subEl = document.getElementById(`subpace-${z.code.toLowerCase()}`);
+                if (subEl) subEl.textContent = z.formattedPace;
+            });
+
+            // Render Zone Cards
+            const container = document.getElementById('zones-container');
+            container.innerHTML = '';
+
+            data.zones.forEach(z => {
+                const card = document.createElement('div');
+                card.className = `bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 transition-all duration-200 shadow-sm ${z.borderHover} hover:shadow-md space-y-3 relative overflow-hidden flex flex-col justify-between`;
+                
+                card.innerHTML = `
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold px-2.5 py-1 rounded-lg border ${z.badgeBg}">
+                                ${z.code} — ${z.name}
+                            </span>
+                            <span class="text-[11px] font-semibold text-slate-400">
+                                ${(z.factor * 100).toFixed(0)}%
+                            </span>
+                        </div>
+
+                        <div class="pt-1">
+                            <div class="text-2xl font-black font-mono text-slate-900 dark:text-white flex items-baseline gap-1">
+                                ${z.formattedPace}
+                                <span class="text-xs font-normal text-slate-500 dark:text-slate-400">/km</span>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                            ${z.desc}
+                        </p>
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+                        <span>Intensidade: <strong>${z.tag}</strong></span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            // Show results container & scroll to it
+            const resultsSec = document.getElementById('results-section');
+            resultsSec.classList.remove('hidden');
+            resultsSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            // Reset Save button state
+            const saveBtn = document.getElementById('btn-save');
+            saveBtn.disabled = false;
+            saveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            saveBtn.innerHTML = `
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                Salvar resultado
+            `;
+        }
+
+        function resetCalculator() {
+            document.getElementById('input-min').value = '';
+            document.getElementById('input-sec').value = '';
+            hideError();
+            document.getElementById('results-section').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('input-min').focus();
+        }
+
+        /* ==========================================================================
+           HISTORY MANAGEMENT (LOCAL STORAGE)
+           ========================================================================== */
+
+        function getHistory() {
+            try {
+                const stored = localStorage.getItem(STORAGE_HISTORY_KEY);
+                return stored ? JSON.parse(stored) : [];
+            } catch (e) {
+                console.error("Erro ao carregar histórico do localStorage", e);
+                return [];
+            }
+        }
+
+        function saveCurrentResult() {
+            if (!currentCalculation) return;
+
+            const history = getHistory();
+            
+            // Check for duplication based on id or content
+            const exists = history.some(item => item.id === currentCalculation.id);
+            if (exists) {
+                showToast('Este resultado já está salvo no histórico.');
+                return;
+            }
+
+            history.unshift(currentCalculation);
+            localStorage.setItem(STORAGE_HISTORY_KEY, JSON.stringify(history));
+
+            // Disable Save Button
+            const saveBtn = document.getElementById('btn-save');
+            saveBtn.disabled = true;
+            saveBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            saveBtn.innerHTML = `
+                <svg class="w-4 h-4 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Salvo no Histórico
+            `;
+
+            renderHistoryUI();
+            showToast('Resultado salvo com sucesso no seu histórico!');
+        }
+
+        function deleteHistoryItem(id) {
+            let history = getHistory();
+            history = history.filter(item => item.id !== id);
+            localStorage.setItem(STORAGE_HISTORY_KEY, JSON.stringify(history));
+            renderHistoryUI();
+            showToast('Registro removido do histórico.');
+        }
+
+        function clearAllHistory() {
+            if (confirm('Tem certeza que deseja apagar todo o seu histórico de testes?')) {
+                localStorage.removeItem(STORAGE_HISTORY_KEY);
+                renderHistoryUI();
+                showToast('Histórico limpo.');
+            }
+        }
+
+        function loadHistoryItemToCalc(id) {
+            const history = getHistory();
+            const item = history.find(i => i.id === id);
+            if (item) {
+                const min = Math.floor(item.totalSeconds / 60);
+                const sec = item.totalSeconds % 60;
+                setPreset(min, sec);
+            }
+        }
+
+        function renderHistoryUI() {
+            const history = getHistory();
+            const emptyState = document.getElementById('history-empty');
+            const tableContainer = document.getElementById('history-container');
+            const tableBody = document.getElementById('history-table-body');
+            const clearBtn = document.getElementById('btn-clear-history');
+            const evoSection = document.getElementById('evolution-section');
+
+            if (history.length === 0) {
+                emptyState.classList.remove('hidden');
+                tableContainer.classList.add('hidden');
+                clearBtn.classList.add('hidden');
+                evoSection.classList.add('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            tableContainer.classList.remove('hidden');
+            clearBtn.classList.remove('hidden');
+
+            tableBody.innerHTML = '';
+            history.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors';
+                tr.innerHTML = `
+                    <td class="py-3 px-4 text-slate-600 dark:text-slate-300">${item.date}</td>
+                    <td class="py-3 px-4 text-slate-900 dark:text-white font-mono font-bold">${item.formattedTestTime}</td>
+                    <td class="py-3 px-4 text-emerald-600 dark:text-emerald-400 font-mono font-bold">${item.formattedPace}/km</td>
+                    <td class="py-3 px-4 text-right space-x-2">
+                        <button onclick="loadHistoryItemToCalc(${item.id})" class="text-xs text-slate-500 hover:text-emerald-500 font-medium transition" title="Carregar na calculadora">
+                            Carregar
+                        </button>
+                        <button onclick="deleteHistoryItem(${item.id})" class="text-xs text-red-400 hover:text-red-600 font-medium transition" title="Excluir">
+                            Excluir
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            // Evolution Section
+            if (history.length >= 2) {
+                evoSection.classList.remove('hidden');
+                renderEvolutionMetrics(history);
+                renderEvolutionChart(history);
+            } else {
+                evoSection.classList.add('hidden');
+            }
+        }
+
+        /* ==========================================================================
+           EVOLUTION & CHART ANALYTICS
+           ========================================================================== */
+
+        function renderEvolutionMetrics(history) {
+            // Best Time & Best Pace
+            const bestTimeSec = Math.min(...history.map(h => h.totalSeconds));
+            const bestPaceSec = Math.min(...history.map(h => h.avgPaceSec));
+
+            document.getElementById('evo-best-time').textContent = secondsToMMSS(bestTimeSec);
+            document.getElementById('evo-best-pace').textContent = `${secondsToMMSS(bestPaceSec)}/km`;
+
+            // First vs Last evolution calculation (history is sorted desc by date in UI)
+            const oldest = history[history.length - 1];
+            const newest = history[0];
+
+            const diffSec = newest.totalSeconds - oldest.totalSeconds; // negative means faster (improvement)
+            const diffEl = document.getElementById('evo-diff');
+            const percentEl = document.getElementById('evo-percent');
+
+            if (diffSec < 0) {
+                const absSec = Math.abs(diffSec);
+                diffEl.textContent = `-${secondsToMMSS(absSec)} min`;
+                diffEl.className = "text-xl sm:text-2xl font-black text-emerald-500 font-mono mt-1";
+            } else if (diffSec > 0) {
+                diffEl.textContent = `+${secondsToMMSS(diffSec)} min`;
+                diffEl.className = "text-xl sm:text-2xl font-black text-red-500 font-mono mt-1";
+            } else {
+                diffEl.textContent = "0s";
+                diffEl.className = "text-xl sm:text-2xl font-black text-slate-400 font-mono mt-1";
+            }
+
+            const percentChange = ((oldest.avgPaceSec - newest.avgPaceSec) / oldest.avgPaceSec) * 100;
+            if (percentChange > 0) {
+                percentEl.textContent = `+${percentChange.toFixed(1)}%`;
+                percentEl.className = "text-xl sm:text-2xl font-black text-emerald-500 font-mono mt-1";
+            } else if (percentChange < 0) {
+                percentEl.textContent = `${percentChange.toFixed(1)}%`;
+                percentEl.className = "text-xl sm:text-2xl font-black text-red-500 font-mono mt-1";
+            } else {
+                percentEl.textContent = "0%";
+                percentEl.className = "text-xl sm:text-2xl font-black text-slate-400 font-mono mt-1";
+            }
+        }
+
+        function renderEvolutionChart(historyData) {
+            const history = historyData || getHistory();
+            if (history.length < 2) return;
+
+            // Chronological order for chart (oldest to newest)
+            const chronHistory = [...history].reverse();
+
+            const ctx = document.getElementById('evolutionChart').getContext('2d');
+            const isDark = document.documentElement.classList.contains('dark');
+
+            const textColor = isDark ? '#94a3b8' : '#64748b';
+            const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+
+            const labels = chronHistory.map(h => h.date);
+            const dataPace = chronHistory.map(h => (h.avgPaceSec / 60).toFixed(2)); // in minutes for Y-axis
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Pace Médio (min/km)',
+                        data: dataPace,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 6,
+                        pointBackgroundColor: '#10b981',
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const sec = Math.round(parseFloat(context.raw) * 60);
+                                    return ` Pace: ${secondsToMMSS(sec)}/km`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: gridColor },
+                            ticks: { color: textColor, font: { family: 'Plus Jakarta Sans' } }
+                        },
+                        y: {
+                            reverse: true, // Lower pace time is higher up on chart (faster)
+                            grid: { color: gridColor },
+                            ticks: {
+                                color: textColor,
+                                font: { family: 'Plus Jakarta Sans' },
+                                callback: function(val) {
+                                    const sec = Math.round(val * 60);
+                                    return secondsToMMSS(sec);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        /* ==========================================================================
+           SHARE & COPY UTILITIES
+           ========================================================================== */
+
+        function getSummaryText() {
+            if (!currentCalculation) return '';
+            let text = `🏃‍♂️ *Pace3K — Resultado do Teste de 3 km*\n`;
+            text += `⏱️ Tempo Total: *${currentCalculation.formattedTestTime}*\n`;
+            text += `⚡ Pace Médio: *${currentCalculation.formattedPace}/km*\n\n`;
+            text += `🎯 *Zonas de Treinamento:*\n`;
+            currentCalculation.zones.forEach(z => {
+                text += `• *${z.code} (${z.name}):* ${z.formattedPace}/km\n`;
+            });
+            text += `\nCalculado no Pace3K.`;
+            return text;
+        }
+
+        function copySummary() {
+            const text = getSummaryText();
+            if (!text) return;
+
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Resumo copiado para a área de transferência!');
+            }).catch(() => {
+                showToast('Erro ao copiar texto.');
+            });
+        }
+
+        function shareResult() {
+            const text = getSummaryText();
+            if (!text) return;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Pace3K — Zonas de Treino',
+                    text: text
+                }).catch(() => {});
+            } else {
+                copySummary();
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            toastMsg.textContent = message;
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        /* ==========================================================================
+           APP INITIALIZATION
+           ========================================================================== */
+        window.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            renderHistoryUI();
+
+            // Auto-focus first input field
+            document.getElementById('input-min').focus();
+        });
+    </script>
+</body>
+</html>
